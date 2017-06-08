@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="refresh" content="60">
+	<title> Train Schedule</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	
+
+	<script
+	  src="https://code.jquery.com/jquery-3.2.1.min.js"
+	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	  crossorigin="anonymous"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
+	<script type="text/javascript">$( document ).ready(function() {	
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCo2ROCsDawJ6NhNQfVJswbxf1_Q9kYunE",
+    authDomain: "train-project-614f9.firebaseapp.com",
+    databaseURL: "https://train-project-614f9.firebaseio.com",
+    projectId: "train-project-614f9",
+    storageBucket: "train-project-614f9.appspot.com",
+    messagingSenderId: "562446770737"
+  };
+  firebase.initializeApp(config);
+
+var database=firebase.database();
+
+var monthDiff = function (enteredDate) {
+	console.log(enteredDate);
+
+var em=enteredDate[0]+enteredDate[1];
+var ed=enteredDate[3]+enteredDate[4];
+var ey=enteredDate[6]+enteredDate[7]+enteredDate[8]+enteredDate[9];
+var d = new Date();
+var cm = d.getMonth()+1;
+var cd=d.getDate();
+var cy=d.getFullYear();
+var now= moment([cy,cm,cd]);
+console.log(now);
+var b = moment([ey, em, ed]);
+console.log(b);
+var months = now.diff(b, 'months');
+b.add(months, 'months');
+console.log(b);
+console.log(months);
+return months;
+}
+
+
+
+$("#addEmployee").on("click", function (event){
+	event.preventDefault();
+	var trainName=$("#trainName").val().trim();
+	var destination= $("#destination").val().trim();
+	var firstTrain= $("#firstTrain").val().trim();
+	var frequency= $("#frequency").val().trim();
+	
+
+
+	database.ref().push({
+	trainName: trainName,
+	destination: destination,
+	firstTrain: firstTrain,
+	frequency: frequency
+	});
+	$("#trainName").val('');
+	$("#destination").val('');
+	$("#firstTrain").val('');
+	$("#frequency").val('');
+	
+});
+
+
+database.ref().on("value", function(snap){
+	$("#displayEmployeeInfo").empty();
+	var sv=snap.val();
+	for (var key in sv) {
+		var trainName = $("<tr>");
+		var destination = $("<td>");
+		var firstTrain = $("<td>");
+		var frequency = $("<td>");
+
+
+		trainInfo.append(trainName);
+		trainInfo.append(destination);
+		trainInfo.append(firstTrain);
+		trainInfo.append(frequency);
+	
+		$("#displayTrainInfo").append(trainInfo);
+		var thisObject=sv[key];
+		var destination = thisObject.destination;
+		console.log(startTime);
+
+
+		var destination = monthDiff (destination);
+		console.log(destination);
+		var frequency = Number (frequency) * Number (thisObject.frequency);
+	
+		employeeNameTd.html(thisObject.trainName);
+		destination.html(thisObject.destination);
+		firstTrain.html(thisObject.firstTrain);
+		frequency.html(thisObject.frequency);
+	}
+
+});
+
+
+})</script>
+	
+
+
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<h1 class="text-center"> <strong>Train Station</strong></h1>
+			 
+		</div>
+
+		<div class="row"> 
+			<div class="col-lg-12">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    <h3 class="panel-title"><strong>TRAINS</strong></h3>
+				  </div>
+				  <div class="panel-body">
+				  		<table class="table table-striped">
+						    <thead>
+						      <tr>
+						        <th>Train Name</th>
+						        <th>Destination</th>
+						        <th>Frequency(min)</th>
+						        <th>Next Arrival</th>
+						        <th>Minutes Away</th>
+						      </tr>
+						    </thead>
+						    <tbody id="displayEmployeeInfo">
+
+						    </tbody>
+						</table>
+				  </div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row"> 
+			<div class="col-lg-12">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    <h3 class="panel-title"><strong>Train Information</strong></h3>
+				  </div>
+				  <div class="panel-body">
+				    <form>
+						<div class="form-group">
+						  <label for="trainName">Train:</label>
+						  <input type="text" class="form-control" id="trainName">
+						</div>
+						<div class="form-group">
+						  <label for="destination">Destination:</label>
+						  <input type="text" class="form-control" id="destination">
+						</div>
+						<div class="form-group">
+						  <label for="firstTrain">First Train:</label>
+						  <input type="text" class="form-control" id="firstTrain">
+						</div>
+						<div class="form-group">
+						  <label for="frequency">Frequency:</label>
+						  <input type="number" class="form-control" id="frequency">
+						</div>						
+				
+						<button type="submit" class="btn btn-default" id="add">Submit</button>
+					</form>
+				  </div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</body>
+</html>
